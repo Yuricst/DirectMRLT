@@ -12,7 +12,7 @@ git submodule update --init --recursive  # if --recurse-submodules flag was forg
 
 ### Submodule dependencies:
 
-- [ICLOCS](https://github.com/ImperialCollegeLondon/ICLOCS)
+- [ICLOCS: https://github.com/ImperialCollegeLondon/ICLOCS](https://github.com/ImperialCollegeLondon/ICLOCS)
 
 ### Toolboxes:
 
