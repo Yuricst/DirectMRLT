@@ -1,3 +1,6 @@
 [submodule "dep/ICLOCS"]
 	path = dep/ICLOCS
 	url = https://github.com/ImperialCollegeLondon/ICLOCS.git
+[submodule "dep/adigator"]
+	path = dep/adigator
+	url = https://github.com/matt-weinstein/adigator.git
