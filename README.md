@@ -1,6 +1,6 @@
 # DirectMRLT
 
-Many revolution low-thrust (MRLT) trajectory optimization with direct collocation using **[ICLOCS](https://github.com/ImperialCollegeLondon/ICLOCS)** on MATLAB
+**Many revolution low-thrust (MRLT) trajectory optimization** with direct collocation using **[ICLOCS](https://github.com/ImperialCollegeLondon/ICLOCS)** on MATLAB
 
 
 For initializing the repository, run
