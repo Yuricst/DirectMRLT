@@ -1,4 +1,4 @@
-function options = settings_LowThrustOrbitTransfer(varargin)
+function options = ICLOCSsettings(varargin)
 
     %SETTINGS - General and solver-specific settings are selected here
     % Unless specified otherwise the options are set using 0 => no and 1 => yes
