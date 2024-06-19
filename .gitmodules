@@ -1,6 +1,3 @@
 [submodule "dep/ICLOCS"]
 	path = dep/ICLOCS
 	url = https://github.com/ImperialCollegeLondon/ICLOCS.git
-[submodule "dep/OPTI"]
-	path = dep/OPTI
-	url = https://github.com/jonathancurrie/OPTI.git
