@@ -16,3 +16,12 @@ git submodule update --init --recursive  # if --recurse-submodules flag was forg
 For IPOPT, 
 
 - Windows: [OPTI](https://github.com/jonathancurrie/OPTI)
+- OSX: [mexIPOPT](https://github.com/ebertolazzi/mexIPOPT)
+
+
+## Dev notes
+
+- [ ] MEE dynamics
+    - [ ] Two-body
+    - [ ] Spherical harmonics
+- [ ] Eclipse constraints
