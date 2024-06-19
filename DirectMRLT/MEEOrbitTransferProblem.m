@@ -4,7 +4,24 @@
 %   Created    : 2024/06/19
 %   Last edits : 2024/06/19
 %
-
+% Inputs:
+%   data : dynamics data struct created with `get_problem_data()`
+%   MEE_0 : 1-by-6 double of initial MEE [p f g h k L]
+%   MEE_F : 1-by-6 double of final MEE [p f g h k L]
+%   m0 : scalar double of initial mass
+%   t0 : scalar double of initial time
+%   tf_bounds : 1-by-2 double of bounds on final time
+%   mf_bounds : 1-by-2 double of bounds on final mass
+%   ICLOCSsettings : function handle to `settings_MEE()`
+%   options : struct with optional fields:
+%       - objective : string of either "mf" or "tof" (default: "mf")
+%       - max_rev : scalar double of maximum number of revolutions (default: 100)
+%       - p_bounds : 1-by-2 double of bounds on p (default: [min(MEE_0(1),MEE_F(1))*0.5 max(MEE_0(1),MEE_F(1))*1.5])
+%
+% Outputs:
+%   problem : ICLOCS problem struct
+%   guess : struct with initial guess for states, inputs, and time
+%
 function [problem, guess] = MEEOrbitTransferProblem(...
     data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,ICLOCSsettings,options)
 
@@ -33,9 +50,9 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     SimDynamics = @dynamics_MEE_internal;
 
     % Analytic derivative files (optional)
-    problem.analyticDeriv.gradCost=[];
-    problem.analyticDeriv.hessianLagrangian=[];
-    problem.analyticDeriv.jacConst=[];
+    problem.analyticDeriv.gradCost = [];
+    problem.analyticDeriv.hessianLagrangian = [];
+    problem.analyticDeriv.jacConst = [];
 
     % Settings file
     problem.settings = ICLOCSsettings;
@@ -67,17 +84,18 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.states.xu = [options.p_bounds(2) 1 1 1 1 2*pi*options.max_rev m0];
 
     % State error bounds
-    problem.states.xErrorTol_local    = [1 1 1 1 1 1 1];
-    problem.states.xErrorTol_integral = [1 1 1 1 1 1 1];
+    x_tol = 1e-2;
+    problem.states.xErrorTol_local    = x_tol * [1 1 1 1 1 1 1];
+    problem.states.xErrorTol_integral = x_tol * [1 1 1 1 1 1 1];
 
     % State constraint error bounds
-    problem.states.xConstraintTol = [1 1 1 1 1 1 1];
+    problem.states.xConstraintTol = x_tol * [1 1 1 1 1 1 1];
 
     % Terminal state bounds. xfl=< xf <=xfu
     problem.states.xfl = [MEE_F(1:5) MEE_0(6) mf_bounds(1)];
     problem.states.xfu = [MEE_F(1:5) 2*pi*options.max_rev mf_bounds(2)];
 
-    % Number of control actions N 
+    % Number of control actions N
     % Set problem.inputs.N=0 if N is equal to the number of integration steps.  
     % Note that the number of integration steps defined in settings.m has to be divisible 
     % by the  number of control actions N whenever it is not zero.
@@ -91,26 +109,30 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.inputs.u0u = [ 1  1  1 1];
 
     % Input constraint error bounds
-    problem.inputs.uConstraintTol = [1 1 1 1];
+    u_tol = 1e-2;
+    problem.inputs.uConstraintTol = [u_tol u_tol u_tol u_tol];
 
     % Choose the set-points if required
     problem.setpoints.states = [];
     problem.setpoints.inputs = [];
 
     % Bounds for path constraint function gl =< g(x,u,p,t) =< gu
-    problem.constraints.ng_eq = 1;
-    problem.constraints.gTol_eq = [1];
+    % problem.constraints.ng_eq = 1;
+    % problem.constraints.gTol_eq = [u_tol];
+    problem.constraints.ng_eq = 0;
+    problem.constraints.gTol_eq = [];
 
-    problem.constraints.gl=[];
-    problem.constraints.gu=[];
-    problem.constraints.gTol_neq=[];
+    problem.constraints.gl=[0];
+    problem.constraints.gu=[1];
+    problem.constraints.gTol_neq=[u_tol];
 
     problem.constraints.bl=[];
     problem.constraints.bu=[];
     problem.constraints.bTol=[];
 
     % Obtain guess of states and input sequences with ode solve
-    [guess.time,guess.states] = ode45(@(t,x) dynamics_MEE_initialguess(t,x,SimDynamics,problem.data), linspace(guess.t0,guess.tf,1000), problem.states.x0);
+    [guess.time,guess.states] = ode45(@(t,x) dynamics_MEE_initialguess(t,x,SimDynamics,problem.data, guess.tf), ...
+        linspace(guess.t0,guess.tf,1000), problem.states.x0);
     guess.inputs(:,1) = 0 * ones(size(guess.time));  % -sind(0)*ones(size(guess.time));
     guess.inputs(:,2) = 1 * ones(size(guess.time));  %  cosd(0)*cosd(30)*ones(size(guess.time));
     guess.inputs(:,3) = 0 * ones(size(guess.time));  % -cosd(0)*sind(30)*ones(size(guess.time));
@@ -129,18 +151,33 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.functions_unscaled      = {@L_unscaled,@E_unscaled,@f_unscaled,@g_unscaled,@avrc,@b_unscaled};
     problem.data.functions_unscaled = problem.functions_unscaled;
     problem.data.ng_eq              = problem.constraints.ng_eq;
-    problem.constraintErrorTol      = [problem.constraints.gTol_eq,problem.constraints.gTol_neq,problem.constraints.gTol_eq,problem.constraints.gTol_neq,problem.states.xConstraintTol,problem.states.xConstraintTol,problem.inputs.uConstraintTol,problem.inputs.uConstraintTol];
+    problem.constraintErrorTol      = [problem.constraints.gTol_eq, ...
+                                       problem.constraints.gTol_neq, ...
+                                       problem.constraints.gTol_eq, ...
+                                       problem.constraints.gTol_neq, ...
+                                       problem.states.xConstraintTol, ...
+                                       problem.states.xConstraintTol, ...
+                                       problem.inputs.uConstraintTol, ...
+                                       problem.inputs.uConstraintTol];
 end
 
 
-function dx = dynamics_MEE_initialguess(t,x,dyn_func,data)
+%% Helper functions
+function dx = dynamics_MEE_initialguess(t,x,dyn_func,data,tf)
+    non_zero_small = 1e-3;
 
-% initial guess control
-u=[0 1 0 1];
-params = [];
+    % initial guess control
+    if t < 0.45 * tf
+        u = [non_zero_small 1-non_zero_small non_zero_small 1-non_zero_small];
+    elseif t < 0.55 * tf
+        u = non_zero_small * [1 1 1 1];
+    else
+        u = [non_zero_small -1+non_zero_small non_zero_small 1-non_zero_small];
+    end
+    params = [];
 
-% Evaluate ODE right-hand side
-dx = dyn_func(x',u,params,t,data)';
+    % Evaluate ODE right-hand side
+    dx = dyn_func(x',u,params,t,data)';
 end
 
 

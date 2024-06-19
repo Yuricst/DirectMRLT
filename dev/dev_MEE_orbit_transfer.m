@@ -4,16 +4,21 @@
 clear; close all; clc;
 addpath('../DirectMRLT/')
 
+GM_SUN = 1.3271244004193938E+11;
+LU = 149.6e6;
+MU = 1500;
+thrust = 0.8;
+mdot = thrust/(9.81 * 3500);
+data = get_problem_data(GM_SUN,LU,MU,thrust,mdot);
+
 % dynamics
 GM = 1.0;
 MEE_0 = [1 0 0 0 0 0];
-MEE_F = [1.52 0 0 0.04 0.02 0];
+MEE_F = [1.1 0 0 0.04 0.02 0];
 m0 = 1.0;
 t0 = 0.0;
-tf_bounds = [0.1*pi 5*pi];
+tf_bounds = [pi 3*pi];
 mf_bounds = [0.3 m0];
-
-data = get_problem_data();
 
 % create problem
 [problem,guess] = MEEOrbitTransferProblem(...
@@ -29,7 +34,6 @@ options= problem.settings(150);                  % h method
 [solution,MRHistory] = solveMyProblem( problem,guess,options);
 [ tv, xv, uv ] = simulateSolution( problem, solution, 'ode113', 0.1 );
 
-
 %% Plots
 % plot initial guess
 fontsize = 14;
@@ -37,20 +41,21 @@ figure('Position',[100,10,1000,600]);
 tiledlayout(2,4);
 for i = 1:7
     nexttile([1,1]);
-    plot(guess.time, guess.states(:,i),'-k','LineWidth',1.2);
+    plot(tv, xv(:,i),'-k','LineWidth',1.2);
     xlabel("Time, TU");
     ylabel(strcat(problem.state_names(i)));
     grid on; box on;
     set(gca,'fontsize',fontsize);
 end
 nexttile;
-plot(guess.time, guess.inputs(:,4),'-k','LineWidth',1.2);
+plot(tv, uv(:,4),'-k','LineWidth',1.2);
 xlabel("Time, TU");
 ylabel('u');
 grid on; box on;
 set(gca,'fontsize',fontsize);
 
-% initial and final orbit
+% solved transfer, initial and final orbit
+RV = MEE2RV(GM, xv(:,1:6));
 RV_initial = MEE2RVorbit(GM,MEE_0);
 RV_final   = MEE2RVorbit(GM,MEE_F);
 

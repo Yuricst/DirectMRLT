@@ -123,8 +123,8 @@ function options = settings_LowThrustOrbitTransfer(varargin)
     % Numerical differentiation: finite differences  ('numeric')
     % Algorithmic differentiation with Adigator      ('adigator')
         % Make sure you provide the path to the Adigator directory of startupadigator.m
-    options.derivatives='numeric';
-    options.adigatorPath='../../adigator';
+    options.derivatives = 'numeric';
+    options.adigatorPath = '../dep/adigator';
     
     % Perturbation sizes for numerical differentiation
     %---------------------------------------
@@ -171,7 +171,10 @@ function options = settings_LowThrustOrbitTransfer(varargin)
     
     % fmincon settings (NOT RECOMMENDED!)
     %---------------------------------------
-    options.fmincon.optimoptions = optimoptions('fmincon','Display','iter','SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true,'MaxIterations',5000);
+    options.fmincon.optimoptions = optimoptions('fmincon','Display','iter',...
+        'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true,...
+        'MaxIterations',5000, ...
+        'OptimalityTolerance',1e-4);
     options.fmincon.hessian_approximation='exact';
     
     % WORHP settings

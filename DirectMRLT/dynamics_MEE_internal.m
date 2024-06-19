@@ -10,7 +10,7 @@
 %          [dx,g_neq] = Dynamics(x,u,params,t,vdat)   (Dynamics and Inqaulity Path Constraints)
 %          [dx,g_eq,g_neq] = Dynamics(x,u,params,t,vdat)   (Dynamics, Equality and Ineqaulity Path Constraints)
 % 
-function [dx,g_eq] = dynamics_MEE_internal(x,u,params,t,vdat)
+function [dx,g_eq,g_neq] = dynamics_MEE_internal(x,u,params,t,vdat)
 
     % extract parameters
     GM = vdat.GM;
@@ -74,5 +74,6 @@ function [dx,g_eq] = dynamics_MEE_internal(x,u,params,t,vdat)
 
     % Return variables
     dx = [dp df dg dh dk dL dm];
-    g_eq = [u_r.^2 + u_t.^2 + u_n.^2 - 1];
+    g_eq = []; % [u_r.^2 + u_t.^2 + u_n.^2 - 1];
+    g_neq = [u_r.^2 + u_t.^2 + u_n.^2];
 end
