@@ -117,14 +117,17 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.setpoints.inputs = [];
 
     % Bounds for path constraint function gl =< g(x,u,p,t) =< gu
-    % problem.constraints.ng_eq = 1;
-    % problem.constraints.gTol_eq = [u_tol];
-    problem.constraints.ng_eq = 0;
-    problem.constraints.gTol_eq = [];
+    problem.constraints.ng_eq = 1;
+    problem.constraints.gTol_eq = [u_tol];
+    problem.constraints.gl = [];
+    problem.constraints.gu = [];
+    problem.constraints.gTol_neq = [];
 
-    problem.constraints.gl=[0];
-    problem.constraints.gu=[1];
-    problem.constraints.gTol_neq=[u_tol];
+    % problem.constraints.ng_eq = 0;
+    % problem.constraints.gTol_eq = [];
+    % problem.constraints.gl=[0];
+    % problem.constraints.gu=[1];
+    % problem.constraints.gTol_neq=[u_tol];
 
     problem.constraints.bl=[];
     problem.constraints.bu=[];
@@ -262,7 +265,7 @@ function bc = b_unscaled(x0,xf,u0,uf,p,t0,tf,vdat,varargin)
     % When adpative time interval add constraint on time
     %------------- BEGIN CODE --------------
     if length(varargin) == 2
-        option = varargin{1};
+        options = varargin{1};
         t_segment = varargin{2};
         if ((strcmp(options.discretization,'hpLGR')) || (strcmp(options.discretization,'globalLGR')))  && options.adaptseg==1 
             if size(t_segment,1)>size(t_segment,2)

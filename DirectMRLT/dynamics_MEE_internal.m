@@ -74,6 +74,6 @@ function [dx,g_eq,g_neq] = dynamics_MEE_internal(x,u,params,t,vdat)
 
     % Return variables
     dx = [dp df dg dh dk dL dm];
-    g_eq = []; % [u_r.^2 + u_t.^2 + u_n.^2 - 1];
-    g_neq = [u_r.^2 + u_t.^2 + u_n.^2];
+    g_eq = [u_r.^2 + u_t.^2 + u_n.^2 - 1];
+    g_neq = []; %[u_r.^2 + u_t.^2 + u_n.^2];
 end

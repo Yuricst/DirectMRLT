@@ -29,8 +29,8 @@ RV = MEE2RV(GM, guess.states(:,1:6));
 %     guess.time,data);
 
 % solve problem
-options= problem.settings(150);                  % h method
-% options= problem.settings(100,4);                  % hp method
+% options= problem.settings(150);                  % h method
+options= problem.settings(100,4);                  % hp method
 [solution,MRHistory] = solveMyProblem( problem,guess,options);
 [ tv, xv, uv ] = simulateSolution( problem, solution, 'ode113', 0.1 );
 
