@@ -5,7 +5,9 @@
 
 % house keeping
 clear; close all; clc;
-addpath('../DirectMRLT/')
+
+fPath = fileparts(matlab.desktop.editor.getActiveFilename);
+addpath(fullfile(fPath,'../../DirectMRLT/'));
 
 % define data
 GM_SUN = 1.3271244004193938E+11;
@@ -24,7 +26,7 @@ tf_bounds = [pi 3*pi];              % bounds on TOF, in TU
 mf_bounds = [0.3 m0];               % bounds on final mass, in MU
 
 % create problem
-objective = "tof";     % "mf" for mass-optimal or "tof" for time-optimal
+objective = "mf";     % "mf" for mass-optimal or "tof" for time-optimal
 [problem,guess] = MEEOrbitTransferProblem(...
     data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,@ICLOCSsettings, ...
     "objective", objective);
@@ -59,6 +61,7 @@ xlabel("Time, TU");
 ylabel('u');
 grid on; box on;
 set(gca,'fontsize',fontsize);
+saveas(gcf,fullfile(fPath,strcat("EarthToMars_statehistory_",objective,".png")));
 
 % solved transfer, initial and final orbit
 RV = MEE2RV(data.GM, xv(:,1:6));
@@ -75,3 +78,4 @@ ylabel("y, LU");
 zlabel("z, LU");
 grid on; box on; axis equal;
 set(gca,'fontsize',fontsize);
+saveas(gcf,fullfile(fPath,strcat("EarthToMars_trajectory_",objective,".png")));
