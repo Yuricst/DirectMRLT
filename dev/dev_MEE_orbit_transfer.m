@@ -37,7 +37,7 @@ options= problem.settings(100,4);                  % hp method
 %% Plots
 % plot initial guess
 fontsize = 14;
-figure('Position',[100,10,1000,600]);
+figure('Position',[100,10,1400,700]);
 tiledlayout(2,4);
 for i = 1:7
     nexttile([1,1]);
@@ -48,7 +48,11 @@ for i = 1:7
     set(gca,'fontsize',fontsize);
 end
 nexttile;
-plot(tv, uv(:,4),'-k','LineWidth',1.2);
+hold on;
+for iu = 1:4
+    plot(tv, uv(:,iu),'LineWidth',1.2);
+end
+legend("u_R","u_T","u_N","||u||");
 xlabel("Time, TU");
 ylabel('u');
 grid on; box on;

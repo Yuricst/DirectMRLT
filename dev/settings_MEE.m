@@ -207,7 +207,7 @@ function options = settings_LowThrustOrbitTransfer(varargin)
     
     % Maximum number of mesh refinement iterations
     %---------------------------------------
-    options.maxMRiter = 2;
+    options.maxMRiter = 0;
     
     % Discountious Input
     %---------------------------------------

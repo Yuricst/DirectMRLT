@@ -109,7 +109,7 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.inputs.u0u = [ 1  1  1 1];
 
     % Input constraint error bounds
-    u_tol = 1e-2;
+    u_tol = 1e-4;
     problem.inputs.uConstraintTol = [u_tol u_tol u_tol u_tol];
 
     % Choose the set-points if required
