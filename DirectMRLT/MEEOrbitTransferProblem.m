@@ -2,7 +2,10 @@
 %
 % Yuri Shimane, yuri.shimane@gatech.edu
 %   Created    : 2024/06/19
-%   Last edits : 2024/06/19
+%   Last edits : 2024/06/20
+%
+% Construct an ICLOCS2 problem for orbit transfer in MEE.
+% This function is intended to be used without modifying its content. 
 %
 % Inputs:
 %   data : dynamics data struct created with `get_problem_data()`
