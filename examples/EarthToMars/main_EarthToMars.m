@@ -17,18 +17,20 @@ thrust = 0.8;
 mdot = thrust/(9.81 * 3500);
 data = get_problem_data(GM_SUN,LU,MU,thrust,mdot);
 
-% initial and final conditions
-MEE_0 = [1 0 0 0 0 0];              % initial MEE, in LU & non-dim & rad
-MEE_F = [1.52 0 0 0.04 0.02 0];     % final MEE, in LU & non-dim & rad
+% initial and final conditions, in LU & non-dim & rad
+MEE_0 = KEP2MEE([1.00000011 0.01671022 deg2rad(0.00005) ...
+                 deg2rad(-11.26064) deg2rad(102.94719) deg2rad(100.46435)]);
+MEE_F = KEP2MEE([1.52366231 0.09341233 deg2rad(1.85061) ...
+                 deg2rad(49.57854) deg2rad(336.04084) deg2rad(355.45332)]);
 m0 = 1.0;                           % initial mass, in MU
 t0 = 0.0;                           % initial time, in TU
-tf_bounds = [pi 3*pi];              % bounds on TOF, in TU
+tf_bounds = [0.5*pi 3*pi];          % bounds on TOF, in TU
 mf_bounds = [0.3 m0];               % bounds on final mass, in MU
 
 % create problem
 objective = "mf";     % "mf" for mass-optimal or "tof" for time-optimal
 [problem,guess] = MEEOrbitTransferProblem(...
-    data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,@ICLOCSsettings, ...
+    data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,@ICLOCSsettings_Earth2Mars, ...
     "objective", objective);
 
 % solve problem
