@@ -71,7 +71,7 @@ function options = ICLOCSsettings(varargin)
     % Global LGR method         ('globalLGR')
     % Local LGR method          ('hpLGR')
     % Automatic chosen direct collocation ('AutoDirect')
-    options.discretization='hermite';
+    %options.discretization='hermite';
     
     % Result Representation:
     %---------------------------------------
@@ -123,8 +123,11 @@ function options = ICLOCSsettings(varargin)
     % Numerical differentiation: finite differences  ('numeric')
     % Algorithmic differentiation with Adigator      ('adigator')
         % Make sure you provide the path to the Adigator directory of startupadigator.m
-    options.derivatives = 'numeric';
-    options.adigatorPath = '../dep/adigator';
+    options.derivatives = 'adigator';
+    %options.adigatorPath = '../dep/adigator';
+
+    fPath = fileparts(matlab.desktop.editor.getActiveFilename);
+    options.adigatorPath = fullfile(fPath,'../../dep/adigator/');
     
     % Perturbation sizes for numerical differentiation
     %---------------------------------------
@@ -142,8 +145,8 @@ function options = ICLOCSsettings(varargin)
     % IPOPT: recommended but needs ipopt.mex        ('ipopt')
     % fmincon                                       ('fmincon')
     % WORHP                                         ('worhp')
-    % options.NLPsolver='ipopt';
-    options.NLPsolver='fmincon';
+    options.NLPsolver='ipopt';
+    %options.NLPsolver='fmincon';
     
     % IPOPT settings (if required)
     %---------------------------------------
@@ -171,11 +174,11 @@ function options = ICLOCSsettings(varargin)
     
     % fmincon settings (NOT RECOMMENDED!)
     %---------------------------------------
-    options.fmincon.optimoptions = optimoptions('fmincon','Display','iter',...
-        'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true,...
-        'MaxIterations',5000, ...
-        'OptimalityTolerance',1e-5);
-    options.fmincon.hessian_approximation='exact';
+    % options.fmincon.optimoptions = optimoptions('fmincon','Display','iter',...
+    %     'SpecifyObjectiveGradient',true,'SpecifyConstraintGradient',true,...
+    %     'MaxIterations',5000, ...
+    %     'OptimalityTolerance',1e-5);
+    % options.fmincon.hessian_approximation='exact';
     
     % WORHP settings
     %---------------------------------------
