@@ -87,7 +87,7 @@ function [problem, guess] = MEEOrbitTransferProblem(...
     problem.states.xu = [options.p_bounds(2) 1 1 1 1 2*pi*options.max_rev m0];
 
     % State error bounds
-    x_tol = 1e-4;
+    x_tol = 1e-6;
     problem.states.xErrorTol_local    = x_tol * [1 1 1 1 1 1 1];
     problem.states.xErrorTol_integral = x_tol * [1 1 1 1 1 1 1];
 
@@ -170,16 +170,17 @@ end
 
 %% Helper functions
 function dx = dynamics_MEE_initialguess(t,x,dyn_func,data,tf)
-    non_zero_small = 1e-3;
+    non_zero_small = 1e-8;
 
-    % initial guess control
-    if t < 0.45 * tf
-        u = [non_zero_small 1-non_zero_small non_zero_small 1-non_zero_small];
-    elseif t < 0.55 * tf
-        u = non_zero_small * [1 1 1 1];
-    else
-        u = [non_zero_small -1+non_zero_small non_zero_small 1-non_zero_small];
-    end
+    % % initial guess control
+    % if t < 0.45 * tf
+    %     u = [non_zero_small 1-non_zero_small non_zero_small 1-non_zero_small];
+    % elseif t < 0.55 * tf
+    %     u = non_zero_small * [1 1 1 1];
+    % else
+    %     u = [non_zero_small 1-non_zero_small non_zero_small 1-non_zero_small];
+    % end
+    u = [0 1 0 1];
     params = [];
 
     % Evaluate ODE right-hand side
