@@ -5,43 +5,61 @@
 
 % house keeping
 clear; close all; clc;
+fontsize = 14;
 
 fPath = fileparts(matlab.desktop.editor.getActiveFilename);
 addpath(fullfile(fPath,'../../DirectMRLT/'));
 
 % define data
-GM_SUN = 1.3271244004193938E+11;
-LU = 149.6e6;
+GM_SUN = 398600.44;
+LU = 42164.0;
 MU = 1500;
-thrust = 0.8;
-mdot = thrust/(9.81 * 3500);
+thrust = 5.0;                  % in N
+mdot = thrust/(9.81 * 1500);    % in kg/s
 data = get_problem_data(GM_SUN,LU,MU,thrust,mdot);
 
-% initial and final conditions, in LU & non-dim & rad
-MEE_0 = KEP2MEE([1.00000011 0.01671022 deg2rad(0.00005) ...
-                 deg2rad(-11.26064) deg2rad(102.94719) deg2rad(100.46435)]);
-MEE_F = KEP2MEE([1.52366231 0.09341233 deg2rad(1.85061) ...
-                 deg2rad(49.57854) deg2rad(336.04084) deg2rad(355.45332)]);
+% initial and final conditions
+KEP_0 = [0.5 0.0 deg2rad(23) deg2rad(100) deg2rad(270) deg2rad(23)];
+KEP_F = [1.0 0.0 deg2rad(0)  deg2rad(102) deg2rad(34)  deg2rad(5)];
+MEE_0 = KEP2MEE(KEP_0);
+MEE_F = KEP2MEE(KEP_F);
 m0 = 1.0;                           % initial mass, in MU
 t0 = 0.0;                           % initial time, in TU
-tf_bounds = [0.5*pi 3*pi];          % bounds on TOF, in TU
-mf_bounds = [0.3 m0];               % bounds on final mass, in MU
+tf_bounds = [5*pi 25*pi];          % bounds on TOF, in TU
+mf_bounds = [0.7 m0];               % bounds on final mass, in MU
+
+% initial and final orbit
+RV_initial = MEE2RVorbit(data.GM,MEE_0);
+RV_final   = MEE2RVorbit(data.GM,MEE_F);
 
 % create problem
-objective = "mf";     % "mf" for mass-optimal or "tof" for time-optimal
+objective = "tof";     % "mf" for mass-optimal or "tof" for time-optimal
 [problem,guess] = MEEOrbitTransferProblem(...
-    data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,@ICLOCSsettings_Earth2Mars, ...
-    "objective", objective,"max_rev",5);
+    data,MEE_0,MEE_F,m0,t0,tf_bounds,mf_bounds,@ICLOCSsettings_GTO2GEO_highthrust, ...
+    "objective", objective,"max_rev",25);
+RV_guess = MEE2RV(data.GM, guess.states(:,1:6));
+
+% plot initial guess
+figure('Position',[600,10,600,500]);
+plot3(RV_initial(:,1),RV_initial(:,2),RV_initial(:,3),'-g','LineWidth',1.2);
+hold on;
+plot3(RV_final(:,1),RV_final(:,2),RV_final(:,3),'-r','LineWidth',1.2);
+plot3(RV_guess(:,1),RV_guess(:,2),RV_guess(:,3),'-k','LineWidth',1.2);
+xlabel("x, LU");
+ylabel("y, LU");
+zlabel("z, LU");
+grid on; box on; axis equal;
+set(gca,'fontsize',fontsize);
+
 
 % solve problem
-% options= problem.settings(150);                  % h method
-options= problem.settings(100,4);                  % hp method
+options= problem.settings(150);                  % h method
+%options= problem.settings(100,4);                  % hp method
 [solution,MRHistory] = solveMyProblem(problem, guess, options);
 [ tv, xv, uv ] = simulateSolution( problem, solution, 'ode113', 0.1 );
 
 %% Plots
 % plot initial guess
-fontsize = 14;
 figure('Position',[100,10,1400,700]);
 tiledlayout(2,4);
 for i = 1:7
@@ -63,12 +81,10 @@ xlabel("Time, TU");
 ylabel('u');
 grid on; box on;
 set(gca,'fontsize',fontsize);
-saveas(gcf,fullfile(fPath,strcat("EarthToMars_statehistory_",objective,".png")));
+saveas(gcf,fullfile(fPath,strcat("GTO2GEO_statehistory_",objective,".png")));
 
 % solved transfer, initial and final orbit
 RV = MEE2RV(data.GM, xv(:,1:6));
-RV_initial = MEE2RVorbit(data.GM,MEE_0);
-RV_final   = MEE2RVorbit(data.GM,MEE_F);
 
 figure('Position',[600,10,600,500]);
 plot3(RV_initial(:,1),RV_initial(:,2),RV_initial(:,3),'-g','LineWidth',1.2);
@@ -80,4 +96,4 @@ ylabel("y, LU");
 zlabel("z, LU");
 grid on; box on; axis equal;
 set(gca,'fontsize',fontsize);
-saveas(gcf,fullfile(fPath,strcat("EarthToMars_trajectory_",objective,".png")));
+saveas(gcf,fullfile(fPath,strcat("GTO2GEO_trajectory_",objective,".png")));

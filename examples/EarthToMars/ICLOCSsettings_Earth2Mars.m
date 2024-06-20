@@ -123,9 +123,8 @@ function options = ICLOCSsettings(varargin)
     % Numerical differentiation: finite differences  ('numeric')
     % Algorithmic differentiation with Adigator      ('adigator')
         % Make sure you provide the path to the Adigator directory of startupadigator.m
-    options.derivatives = 'adigator';
-    %options.adigatorPath = '../dep/adigator';
-
+    options.derivatives = 'numeric';
+    %options.adigatorPath = '../..dep/adigator';
     fPath = fileparts(matlab.desktop.editor.getActiveFilename);
     options.adigatorPath = fullfile(fPath,'../../dep/adigator/');
     
